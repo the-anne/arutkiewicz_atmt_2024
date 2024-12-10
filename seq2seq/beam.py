@@ -212,7 +212,8 @@ class BeamSearch(object):
         for fn in finished_nodes:
             nodes_queue.put(fn)
 
-        for _ in range(len(nodes)):
+        for i in range(len(nodes)):
+            node = nodes[i]
             if nodes_queue.qsize() < self.beam_size:
                 if ((self.highest_finished_seq_prob is None) or (node[0] <= self.highest_finished_seq_prob)):
                         nodes_queue.put(node)
