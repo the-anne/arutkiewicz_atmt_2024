@@ -169,7 +169,7 @@ class BeamSearch(object):
         self.nodes = nodes
 
     def prune_constant_beam_size_v3(self):
-        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where effective beam size remains constant """
+        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where effective beam size remains constant (v3)"""
         nodes = PriorityQueue()
         for _ in range(self.beam_size):
             node = self.nodes.get()
