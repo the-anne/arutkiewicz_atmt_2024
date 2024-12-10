@@ -30,6 +30,7 @@ def get_args():
 
     # Add beam search arguments
     parser.add_argument('--beam-size', default=5, type=int, help='number of hypotheses expanded in beam search')
+    parser.add_argument('--beam-size-stopping-crit', default='default', type=str, help='stopping criterion to use for beam search')
     # alpha hyperparameter for length normalization (described as lp in https://arxiv.org/pdf/1609.08144.pdf equation 14)
     parser.add_argument('--alpha', default=0.0, type=float, help='alpha for softer length normalization')
 
@@ -125,9 +126,17 @@ def main(args):
         #import pdb;pdb.set_trace()
         # Start generating further tokens until max sentence length reached
         for _ in range(args.max_len-1):
-
             # Get the current nodes to expand
-            nodes = [n[1] for s in searches for n in s.get_current_beams()]
+            if args.beam_size_stopping_crit == 'default':
+                nodes = [n[1] for s in searches for n in s.get_current_beams()]
+            elif args.beam_size_stopping_crit == 'constant_beam_size':
+                nodes = [n[1] for s in searches for n in s.get_current_beams_constant_beam_size()]
+                #nodes = [n[1] for s in searches for n in s.get_current_beams_constant_beam_size_v2()]
+                #nodes = [n[1] for s in searches for n in s.get_current_beams_constant_beam_size_v3()]
+            else: #pruning
+                nodes = [n[1] for s in searches for n in s.get_current_beams_constant_beam_size(check_best=True)]
+                #nodes = [n[1] for s in searches for n in s.get_current_beams_constant_beam_size_v2(check_best=True)]
+
             if nodes == []:
                 break # All beams ended in EOS
 
@@ -177,7 +186,14 @@ def main(args):
                             node.final_cell, node.mask, torch.cat((prev_words[i][0].view([1]),
                             next_word)), node.logp, node.length
                             )
-                        search.add_final(-node.eval(args.alpha), node)
+                        if args.beam_size_stopping_crit == 'default':
+                            search.add_final(-node.eval(args.alpha), node)
+                        elif args.beam_size_stopping_crit == 'constant_beam_size':
+                            node.is_finished = True
+                            search.add(-node.eval(args.alpha), node, add_padding=True)
+                        elif args.beam_size_stopping_crit == 'pruning':
+                            node.is_finished = True
+                            search.add(-node.eval(args.alpha), node, add_padding=True, check_best=True)
 
                     # Add the node to current nodes for next iteration
                     else:
@@ -191,8 +207,18 @@ def main(args):
             # #import pdb;pdb.set_trace()
             # __QUESTION 5: What happens internally when we prune our beams?
             # How do we know we always maintain the best sequences?
-            for search in searches:
-                search.prune()
+            if args.beam_size_stopping_crit == 'default':
+                for search in searches:
+                    search.prune()
+            elif args.beam_size_stopping_crit == 'constant_beam_size':
+                for search in searches:
+                    search.prune_constant_beam_size()
+                    #search.prune_constant_beam_size_v2()
+                    #search.prune_constant_beam_size_v3()
+            elif args.beam_size_stopping_crit == 'pruning':
+                for search in searches:
+                    search.prune_pruning()
+                    #search.prune_pruning_v2()
 
         # Segment into sentences
         best_sents = torch.stack([search.get_best()[1].sequence[1:].cpu() for search in searches])
