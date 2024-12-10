@@ -46,7 +46,7 @@ class BeamSearch(object):
         return nodes
     
     def get_current_beams_constant_beam_size(self, check_best=False):
-        """ Returns beam_size unfinished nodes with the lowest negative log probability - where beam_size is constant (v1)"""
+        """ Returns beam_size unfinished nodes with the lowest negative log probability - where effective beam size remains constant"""
         nodes_ret = []
         finished_nodes = PriorityQueue()
 
@@ -63,7 +63,7 @@ class BeamSearch(object):
         return nodes_ret
 
     def get_current_beams_constant_beam_size_v2(self, check_best=False):
-        """ Returns beam_size unfinished nodes with the lowest negative log probability - where beam_size is constant (v2)"""
+        """ Returns beam_size unfinished nodes with the lowest negative log probability - where effective beam size remains constant (v2)"""
         nodes_ret = []
         active_nodes = []
         finished_nodes = PriorityQueue()
@@ -85,7 +85,7 @@ class BeamSearch(object):
         return nodes_ret
     
     def get_current_beams_constant_beam_size_v3(self):
-        """ Returns beam_size unfinished nodes with the lowest negative log probability - where beam_size is constant (v3)"""
+        """ Returns beam_size unfinished nodes with the lowest negative log probability - where effective beam size remains constant (v3)"""
         finished_nodes = PriorityQueue()
         nodes_ret = []
 
@@ -128,7 +128,7 @@ class BeamSearch(object):
         self.nodes = nodes
 
     def prune_constant_beam_size(self):
-        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where beam_size is constant (v1)"""
+        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where effective beam size remains constant"""
         finished = []
         nodes = PriorityQueue()
         while not self.nodes.empty():
@@ -145,7 +145,7 @@ class BeamSearch(object):
         self.nodes = nodes
 
     def prune_constant_beam_size_v2(self):
-        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where beam_size is constant """
+        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where effective beam size remains constant (v2)"""
         finished = []
         active = []
         nodes = PriorityQueue()
@@ -169,7 +169,7 @@ class BeamSearch(object):
         self.nodes = nodes
 
     def prune_constant_beam_size_v3(self):
-        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where beam_size is constant """
+        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where effective beam size remains constant """
         nodes = PriorityQueue()
         for _ in range(self.beam_size):
             node = self.nodes.get()
@@ -178,7 +178,7 @@ class BeamSearch(object):
         self.nodes = nodes
 
     def prune_pruning(self):
-        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where beam_size is constant (v1)"""
+        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where effective beam size remains constant and we prune some unfinished hypotheses"""
         nodes = PriorityQueue()
         finished_nodes = []
 
@@ -197,7 +197,7 @@ class BeamSearch(object):
         self.nodes = nodes
 
     def prune_pruning_v2(self):
-        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where beam_size is constant (v2)"""
+        """ Removes all nodes but the beam_size best ones (lowest neg log prob) - where effective beam size remains constant and we prune some unfinished hypotheses (v2)"""
         nodes = []
         finished_nodes = []
         nodes_queue = PriorityQueue()

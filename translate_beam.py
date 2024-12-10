@@ -74,7 +74,6 @@ def main(args):
     # Iterate over the test set
     all_hyps = {}
     for i, sample in enumerate(progress_bar):
-        print(f"i_outer={i}\n")
 
         # Create a beam search object or every input sentence in batch
         batch_size = sample['src_tokens'].shape[0]
@@ -139,7 +138,6 @@ def main(args):
                 #nodes = [n[1] for s in searches for n in s.get_current_beams_constant_beam_size_v2(check_best=True)]
 
             if nodes == []:
-                print("uuu\n")
                 break # All beams ended in EOS
 
             # Reconstruct prev_words, encoder_out from current beam search nodes
@@ -163,7 +161,6 @@ def main(args):
 
             # Create number of beam_size next nodes for every current node
             for i in range(log_probs.shape[0]):
-                print(f"i={i}")
                 for j in range(args.beam_size):
 
                     best_candidate = next_candidates[i, :, j]
@@ -194,7 +191,6 @@ def main(args):
                         elif args.beam_size_stopping_crit == 'constant_beam_size':
                             node.is_finished = True
                             search.add(-node.eval(args.alpha), node, add_padding=True)
-                            print(f"A node has finished with score {-node.eval(args.alpha)}!\n")
                         elif args.beam_size_stopping_crit == 'pruning':
                             node.is_finished = True
                             search.add(-node.eval(args.alpha), node, add_padding=True, check_best=True)
